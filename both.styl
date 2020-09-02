@@ -1,0 +1,330 @@
+$colors = {
+	black: {
+		bg: #000
+		tint: #343434
+		shade: #000
+		color: #fff
+		text: #000
+		muted: #eee
+	}
+	white: {
+		bg: #fff
+		tint: #fff
+		shade: #e8e8e8
+		color: #000
+		text: #000
+		muted: #66757f
+	}
+	dark: {
+		bg: #3c4248
+		tint: #566069
+		shade: #2a2f33
+		color: #fff
+		text: #3c4248
+		muted: #eee
+	}
+	gray: {
+		bg: #6d7c86
+		tint: #a0aeb7
+		shade: #49555d
+		color: #fff
+		text: #6d7c86
+		muted: #eee
+	}
+	light: {
+		bg: #e5e8ea
+		tint: #f3f5f7
+		shade: #c3c7ca
+		color: #000
+		text: #000
+		muted: #66757f
+	}
+	blue: {
+		bg: #1d88f2
+		tint: #88c7ef
+		shade: #0e74b3
+		color: #fff
+		text: #1d88f2
+		muted: #eee
+	}
+	green: {
+		bg: #17bf63
+		tint: #84ebb3
+		shade: #108645
+		color: #fff
+		text: #17bf63
+		muted: #eee
+	}
+	yellow: {
+		bg: #ffad1f
+		tint: #f9d089
+		shade: #c48415
+		color: #fff
+		text: #ffad1f
+		muted: #eee
+	}
+	red: {
+		bg: #f51e39
+		tint: #ff919f
+		shade: #ce031d
+		color: #fff
+		text: #f51e39
+		muted: #eee
+	}
+}
+text-truncate =
+	overflow hidden
+	text-overflow ellipsis
+	white-space nowrap
+	word-break break-word
+user-drag()
+	-webkit-user-drag arguments
+	user-drag arguments
+
+body
+	margin 0
+	font-family "Saira Condensed",sans-serif
+	font-size 16px
+	line-height 1.15
+	word-break break-word
+	user-select none
+*, *:before, *:after
+	box-sizing border-box
+	letter-spacing .5px
+*
+	vertical-align middle
+a, img
+	user-drag none
+textarea
+	resize vertical
+img, a
+	user-drag none
+
+.Button
+	padding 8px
+	border 0
+	border-radius 8px
+	font inherit
+	cursor pointer
+	outline 0
+.Button-text
+	padding 0 8px
+for color, c in $colors
+	.Button-{color}
+		background: c.bg
+		color: c.color
+		&:active
+		&.active
+			background: c.shade
+.TextInput
+	border-radius 8px
+	display flex
+	background #e6ecf0
+.TextInput-input
+	padding 8px 16px
+	border 0
+	border-radius 8px
+	flex-grow 1
+	font inherit
+	background #fff
+	box-shadow 0 0 0 1px inset #ccd6dd
+	outline 0
+	&:focus
+		box-shadow: 0 0 0 2px $colors.blue.bg
+		z-index 1
+.Menu
+	min-width 180px
+	max-width 360px
+	padding 8px
+	border-radius 8px
+	display inline-block
+	background #fff
+	box-shadow 0 0 0 1px inset #ccd6dd
+.Menu-item
+	position relative
+	padding 8px
+	border-radius 8px
+	display flex
+	align-items center
+	cursor pointer
+for color, c in $colors
+	.Menu-item-{color}
+		color: c.text
+		&:hover
+		&.hover
+			background: c.bg
+			color: c.color
+			.Menu-itemLabel
+				color: c.muted
+		&.Menu-item-noSubmenu
+			&:active
+			&.active
+				background: c.shade
+			.Menu-itemLabel
+				font-size 13px
+.Menu-itemIcon
+	width 1em
+	margin-right 8px
+	display inline-flex
+	align-items center
+.Menu-itemText
+	flex-grow 1
+	{text-truncate}
+.Menu-itemLabel
+	margin-left 16px
+	color #66757f
+	{text-truncate}
+.Menu-submenu
+	position absolute
+	left 100%
+	top -8px
+	min-width 160px
+	z-index 2
+.Icon-img
+	width 1em
+	height 1em
+	display inline-block
+	object-fit scale-down
+for color, c in $colors
+	.{color}
+		background-color: c.bg
+		color: c.color
+	.text-{color}
+		color: c.text
+
+.row
+	display flex
+	flex-direction row
+.column
+	display flex
+	flex-direction column
+.col
+	flex-grow 1
+.col-0
+	flex-grow 0
+for i in range(1, 12)
+	val = floor(i / 12 * 100%, 2)
+	.row > .col-{i}
+		width val
+	.column > .col-{i}
+		height val
+	val = floor(100% / i, 2)
+	.row-{i}
+		display grid
+		grid-template-columns repeat(i,1fr)
+		> .col-{i}
+			grid-column span (i)
+.full
+	position absolute
+	left 0
+	top 0
+	width 100%
+	height 100%
+.wrap
+	flex-wrap wrap
+.nowrap
+	flex-wrap nowrap
+for dir in row column
+	.{dir}
+		prop = dir is row ? "justify-content" : "align-items"
+		&.start
+			{prop} flex-start
+		&.center
+			{prop} center
+		&.end
+			{prop} flex-end
+		prop = dir is row ? "align-items" : "justify-content"
+		&.top
+			{prop} flex-start
+		&.middle
+			{prop} center
+		&.bottom
+			{prop} flex-end
+.between
+	justify-content space-between
+.around
+	justify-content space-around
+.evenly
+	justify-content space-evenly
+.stretch
+	align-items stretch
+props = {p: padding, m: margin}
+sides = {t: top, r: right, b: bottom, l: left}
+sizes = 32px 16px 8px 4px 2px 0
+for p, prop in props
+	for size, i in sizes
+		i = 5 - i
+		.{p}-{i}
+			{prop} size
+		.-{p}-{i}
+			{prop} -(size)
+		.{p}x-{i}
+			{prop}-left size
+			{prop}-right size
+		.{p}y-{i}
+			{prop}-top size
+			{prop}-bottom size
+		.-{p}x-{i}
+			{prop}-left -(size)
+			{prop}-right -(size)
+		.-{p}y-{i}
+			{prop}-top -(size)
+			{prop}-bottom -(size)
+		for s, side in sides
+			.{p}{s}-{i}
+				{prop}-{side} size
+			if p is m and i
+				.-{p}{s}-{i}
+					{prop}-{side} -(size)
+for pos in absolute relative fixed
+	.{pos}
+		position pos
+for size in 100 75 50 25 0
+	.w-{size}
+		width (size)%
+	.h-{size}
+		height (size)%
+for i in 0..5
+	.z-{i}
+		z-index i
+	if i
+		.-z-{i}
+			z-index -(i)
+for dis in block inline-block inline flex inline-flex
+	.{dis}
+		display dis
+.hidden, [hidden]
+	display none
+for align in left center right justify
+	.text-{align}
+		text-align align
+.text-baseline
+	vertical-align baseline
+.text-bold
+	font-weight bold
+.text-italic
+	font-style italic
+.text-nowrap
+	white-space nowrap
+	word-break break-word
+.text-truncate
+	{text-truncate}
+.text-select
+	user-select auto
+.text-noselect
+	user-select none
+.scroll
+	overflow auto
+.scroll-y
+	overflow-x hidden
+	overflow-y auto
+.noscroll
+	overflow hidden
+.event
+	pointer-events auto
+.noevent
+	pointer-events none
+.events
+	pointer-events none
+	> *
+		pointer-events auto
