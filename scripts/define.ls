@@ -1,54 +1,93 @@
-Object.assign m,
-	class: (...vals) ->
-		res = []
-		for val in vals
-			if Array.isArray val
-				res.push m.class ...val
-			else if val instanceof Object
-				for k, v of val
-					res.push k if v
-			else res.push val
-		res * " "
+let
+	uniqId = 0
 
-	bind: (comp) !->
-		for k, val of comp
-			if typeof val is \function and val.name isnt /(bound|class) /
-				comp[k] = val.bind comp
+	m <<<<
+		class: (...vals) ->
+			res = []
+			for val in vals
+				if Array.isArray val
+					res.push m.class ...val
+				else if val instanceof Object
+					for k, v of val
+						res.push k if v
+				else res.push val
+			res * " "
 
-	fetch: (url, dataType = \text) ->
-		(await fetch url)[dataType]!
+		bind: (comp) !->
+			for k, val of comp
+				if typeof val is \function and val.name isnt /(bound|class) /
+					comp[k] = val.bind comp
 
-	menu: (items) ->
-		items = _.castArray items
-		for item in items
-			item.color ?= \light
-			if item.submenu
-				item.submenu = m.menu that
-		items
+		rand: (min, max) ->
+			switch &length
+			| 0 =>
+				max = 1
+				min = 0
+			| 1 =>
+				max = min
+				min = 0
+			Math.floor min + Math.random! * (1 + Math.abs max - min)
 
-	component: (comp) ->
-		ctor = comp::?@@?bind comp or !->
-		oncreate = comp::?oncreate?bind comp or !->
-		onbeforeupdate = comp::?onbeforeupdate?bind comp or !->
-		comp::@@ = (vnode) !->
-			console.log vnode
-			m.onvnode.call @, vnode
-			ctor vnode
-		comp::oncreate = (vnode) !->
-			m.onvnode.call @, vnode
-			oncreate vnode
-		comp::onbeforeupdate = (vnode) ->
-			old =
-				attrs: {...@attrs}
-				children: [...@children]
-			m.onvnode.call @, vnode
-			onbeforeupdate old, vnode
-		m.bind comp
-		comp
+		uuid: ->
+			"$#{m.rand 9e9}#{m.uniqId!}#{Date.now!}"
 
-	onvnode: (vnode) !->
-		{@attrs = {}, @children = [], @dom} = vnode
-		if @ondefault
-			defls = @ondefault vnode or {}
-			@attrs = Object.assign defls, @attrs
-		@onassign? vnode
+		uniqId: ->
+			++uniqId
+
+		fetch: (url, dataType = \text) ->
+			(await fetch url)[dataType]!
+
+		menu: (items) ->
+			items = _.castArray items
+			for item, id in items
+				item.id = id
+				item.color ?= \light
+				if item.submenu
+					item.submenu = m.menu that
+			items
+
+		component: (opts) ->
+			->
+				old = null
+				comp = {
+					...opts
+					attrs: {}
+					children: []
+					__oninit: opts.oninit or ->
+					__oncreate: opts.oncreate or ->
+					__onbeforeupdate: opts.onbeforeupdate or ->
+					__onupdate: opts.onupdate or ->
+					oninit: (v) !->
+						m.onvnode @, v
+						@__oninit v
+						old :=
+							attrs: {...@attrs}
+							children: [...@children]
+					oncreate: (v) !->
+						@{dom} = v
+						@__oncreate v
+					onbeforeupdate: (v) ->
+						m.onvnode @, v
+						@__onbeforeupdate old, v
+					onupdate: (v) !->
+						@{dom} = v
+						@__onupdate old, v
+						old :=
+							attrs: {...@attrs}
+							children: [...@children]
+				}
+				m.bind comp
+				comp
+
+		onvnode: (inst, v) !->
+			{modelAttr} = inst
+			if isUncontrolModel = modelAttr and modelAttr of inst.attrs
+				modelVal = inst.attrs[modelAttr]
+			inst.attrs = v.attrs or {}
+			inst.children = v.children or []
+			if attrs = inst.ondefault? v
+				for k, val of attrs
+					v.attrs[k] ?= val
+			inst.onassign? v
+			if isUncontrolModel
+				inst.attrs[modelAttr] = modelVal

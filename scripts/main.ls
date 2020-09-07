@@ -1,8 +1,10 @@
-App = m.component class
-	->
+App = m.component do
+	oninit: (v) !->
 		@colors = <[black white dark gray light blue green yellow red]>
 		@val = "Chào :3"
 		@val2 = "Meme"
+		@isShow = yes
+		@popperPlacement = \auto
 		@list = m.menu [
 			* text: "Chọn"
 				color: \blue
@@ -33,12 +35,13 @@ App = m.component class
 					* text: "Ngày"
 			* text: "Trang chủ"
 				icon: \home
+				label: \Alt+Home
 			* text: "Xóa"
 				icon: \trash
 				color: \red
 				label: \Del
-			* text: "Thông tin"
-				label: \Alt+Enter
+			* text: "Văn bản này dài khá dài đó, không biết nó dài đến đâu nữa, à dài đến đây thôi"
+				label: \Shift+PgUp
 			* text: "Tìm kiếm trên Google..."
 				icon: \https://image.flaticon.com/icons/svg/2702/2702602.svg
 			* text: "Chia sẻ"
@@ -57,28 +60,48 @@ App = m.component class
 
 	view: ->
 		m \.p-3,
-			# @colors.map (color) ~>
-			# 	m Button,
-			# 		color: color
-			# 		color
+			@colors.map (color) ~>
+				m Button,
+					color: color
+					color
 			m TextInput,
-				value: @val
-				onInput: (@val) !~>
+				defaultValue: "haha"
+				oninput: (@val) !~>
 			m TextInput,
 				value: @val2
-				onInput: (@val2) !~>
+				oninput: (@val2) !~>
 			m \p @val
 			m \p @val2
-			# m Button, "xinchao"
-			# m Button,
-			# 	onClick: !~>
-			# 		@val = ""
-			# 	"Reset val"
-			# m Menu,
-			# 	list: @list
-			# m Icon, name: \home
-			# m Icon, name: \fad:beer
-			# m Icon, name: \https://image.flaticon.com/icons/svg/3352/3352375.svg
-			# m \span \oks
-			# m Popover,
-			# 	m Button, "Click me!"
+			m Button,
+				onclick: !~>
+					@val = ""
+				"Reset val"
+			m Button,
+				onclick: !~>
+					not= @isShow
+				"Toggle isShow: #{@isShow}"
+			m Menu,
+				list: @list
+			m Icon, name: \home
+			m Icon, name: \fad:beer
+			m Icon, name: \https://image.flaticon.com/icons/svg/3352/3352375.svg
+			m \span \oks
+			m Button,
+				onclick: !~>
+					@popperPlacement = @popperPlacement is \auto and \bottom-end or \auto
+				"popperPlacement: #{@popperPlacement}"
+			m Popover,
+				placement: @popperPlacement
+				content:
+					m \.p-3,
+						m \h3 "Đây là một cái Popover xịn xò!"
+						m \small.text-gray Date.now!
+						m \br
+						m ButtonGroup,
+							m Button,
+								\OK
+							m Button,
+								color: \red
+								\Đóng
+				if @isShow
+					m Button, "Click me!"

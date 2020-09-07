@@ -1,12 +1,15 @@
-Button =
-	oninit: (v) !->
-		v.attrs.color ?= \light
+Button = m.component do
+	ondefault: ->
+		color: \light
 
-	view: (v) ->
+	view: ->
 		m \button.Button,
 			class: m.class do
-				"Button-#{v.attrs.color}"
-				"active": v.attrs.active
-			onclick: v.attrs.onClick
+				"active": @attrs.active
+				"Button-#{@attrs.color}"
+				@attrs.class
+			onclick: @attrs.onclick
+			onmouseenter: @attrs.onmouseenter
+			onmouseleave: @attrs.onmouseleave
 			m \.Button-text,
-				v.children
+				@children

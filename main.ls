@@ -6,7 +6,7 @@ fetch2 = (path) ->
 	(await fetch path)[dataType]!
 
 styl += await fetch2 \both.styl
-styl = stylus.render styl
+styl = stylus.render styl, {+compress}
 stylEl.textContent = styl
 
 paths = <[

@@ -1,14 +1,16 @@
-TextInput =
-	oninit: (v) !->
-		# @isModel = \value of @attrs
-		# @value = @attrs.defaultValue
+TextInput = m.component do
+	modelAttr: \value
 
-	view: (v) ->
-		aa = v.attrs
+	oninit: !->
+		@attrs.value ?= @attrs.defaultValue
+
+	ondefault: ->
+		defaultValue: ""
+
+	view: ->
 		m \.TextInput,
 			m \input.TextInput-input,
-				value: if @isModel => @attrs.value else @value
+				value: @attrs.value
 				oninput: !~>
-					console.log aa is v.attrs
-					@value = it.target.value
-					# @attrs.onInput? @value
+					@attrs.value = it.target.value
+					@attrs.oninput? @attrs.value

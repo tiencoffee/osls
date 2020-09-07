@@ -1,4 +1,4 @@
-Icon = m.component class
+Icon = m.component do
 	onassign: !->
 		{name} = @attrs
 		name = "fas:#name" unless name.includes \:
