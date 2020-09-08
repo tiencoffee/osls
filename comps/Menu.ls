@@ -1,13 +1,6 @@
 Menu = m.component do
-	viewMenuItem: (item) ->
-		m \.Menu-item,
-			key: item.id
-			class: m.class do
-				"Menu-item-#{item.color}"
-				"Menu-item-noSubmenu": not item.submenu
-				"hover": @item is item
-			onmouseenter: !~>
-				@item = item.submenu and item
+	viewMenuItemChildren: (item) ->
+		m.fragment do
 			m \.Menu-itemIcon,
 				if item.icon
 					m Icon, name: item.icon
@@ -30,9 +23,19 @@ Menu = m.component do
 						placement: \right-start
 						offsets: [-6 0]
 						flips: [\left-start]
-						content:
+						targetAttrs:
+							class: m.class do
+								"hover": @item is item
+						onmouseenter: !~>
+							@item = item
+						content: ~>
 							m Menu,
 								list: item.submenu
-						@viewMenuItem item
+						@viewMenuItemChildren item
 				else
-					@viewMenuItem item
+					m \.Menu-item,
+						key: item.id
+						class: m.class do
+							"Menu-item-#{item.color}"
+							"Menu-item-noSubmenu"
+						@viewMenuItemChildren item

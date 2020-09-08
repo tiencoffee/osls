@@ -86,14 +86,13 @@ text-security()
 
 body
 	margin 0
-	font-family "Saira Condensed",sans-serif
-	font-size 16px
-	line-height 1.15
+	font-family "Roboto",sans-serif
+	font-size 15px
+	line-height 1.2
 	word-break break-word
 	user-select none
 *, *:before, *:after
 	box-sizing border-box
-	letter-spacing .5px
 *
 	vertical-align middle
 a, img
@@ -103,6 +102,12 @@ textarea
 input[type=password]
 	text-security square
 
+.Popover
+	border-radius 8px
+	background #fff
+	box-shadow 0 0 0 1px inset #ccd6dd
+.Popover-target
+	display inline-block
 .Button
 	padding 6px
 	border 0
@@ -116,6 +121,7 @@ for color, c in $colors
 	.Button-{color}
 		background: c.bg
 		color: c.color
+		box-shadow: 0 0 0 1px inset c.shade
 		&:active
 		&.active
 			background: c.shade
@@ -201,10 +207,6 @@ for color, c in $colors
 	height 1em
 	display inline-block
 	object-fit scale-down
-.Popover
-	border-radius 8px
-	background #fff
-	box-shadow 0 0 0 1px inset #ccd6dd
 for color, c in $colors
 	.{color}
 		background-color: c.bg

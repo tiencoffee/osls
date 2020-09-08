@@ -57,6 +57,7 @@ let
 					__oncreate: opts.oncreate or ->
 					__onbeforeupdate: opts.onbeforeupdate or ->
 					__onupdate: opts.onupdate or ->
+					__ondom: opts.ondom or ->
 					oninit: (v) !->
 						m.onvnode @, v
 						@__oninit v
@@ -66,12 +67,14 @@ let
 					oncreate: (v) !->
 						@{dom} = v
 						@__oncreate v
+						@__ondom v
 					onbeforeupdate: (v) ->
 						m.onvnode @, v
 						@__onbeforeupdate old, v
 					onupdate: (v) !->
 						@{dom} = v
 						@__onupdate old, v
+						@__ondom v
 						old :=
 							attrs: {...@attrs}
 							children: [...@children]
