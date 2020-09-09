@@ -1,5 +1,6 @@
 TextInput = m.component do
-	modelAttr: \value
+	options:
+		model: \value
 
 	oninit: !->
 		@attrs.value ?= @attrs.defaultValue

@@ -47,50 +47,45 @@ let
 			items
 
 		component: (opts) ->
+			opts.hooks ?= {}
 			->
 				old = null
-				comp = {
-					...opts
+				scope =
 					attrs: {}
 					children: []
-					__oninit: opts.oninit or ->
-					__oncreate: opts.oncreate or ->
-					__onbeforeupdate: opts.onbeforeupdate or ->
-					__onupdate: opts.onupdate or ->
-					__ondom: opts.ondom or ->
-					oninit: (v) !->
-						m.onvnode @, v
-						@__oninit v
+					dom: null
+				scope <<<< that if opts.methods
+				comp =
+					oninit: !->
+						m.onvnode @, it
+						scope <<<< that! if opts.state
+						opts.hooks.init?call scope
 						old :=
-							attrs: {...@attrs}
-							children: [...@children]
-					oncreate: (v) !->
-						@{dom} = v
-						@__oncreate v
-						@__ondom v
-					onbeforeupdate: (v) ->
-						m.onvnode @, v
-						@__onbeforeupdate old, v
-					onupdate: (v) !->
-						@{dom} = v
-						@__onupdate old, v
-						@__ondom v
+							attrs: {...scope.attrs}
+							children: [...scope.children]
+					oncreate: !->
+						scope.dom = it.dom
+						opts.hooks.create?call scope
+					onbeforeupdate: ->
+						m.onvnode @, it
+						opts.hooks.onbeforeupdate?call scope, old
+					onupdate: !->
+						scope.dom = it.dom
+						opts.hooks.onupdate?call scope, old
 						old :=
-							attrs: {...@attrs}
-							children: [...@children]
-				}
-				m.bind comp
+							attrs: {...scope.attrs}
+							children: [...scope.children]
+				m.bind scope
 				comp
 
 		onvnode: (inst, v) !->
-			{modelAttr} = inst
-			if isUncontrolModel = modelAttr and modelAttr of inst.attrs
-				modelVal = inst.attrs[modelAttr]
+			{model} = inst.options
+			if isUncontrolModel = model and model of inst.attrs
+				modelVal = inst.attrs[model]
 			inst.attrs = v.attrs or {}
 			inst.children = v.children or []
 			if attrs = inst.ondefault? v
 				for k, val of attrs
 					v.attrs[k] ?= val
-			inst.onassign? v
 			if isUncontrolModel
-				inst.attrs[modelAttr] = modelVal
+				inst.attrs[model] = modelVal

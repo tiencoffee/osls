@@ -1,12 +1,38 @@
 Popover = m.component do
-	modelAttr: \isOpen
+	model:
+		attr: \isOpen
+		default: -> @attrs.defaultIsOpen
 
-	oninit: ->
-		@attrs.isOpen ?= @attrs.defaultIsOpen
-		@popper = null
-		@portal = m \.Popover,
+	attrs:
+		defaultIsOpen: Boolean
+		placement:
+			type: String
+			default: \auto
+		offsets:
+			type: Array
+			default: -> [0 0]
+		padding:
+			type: Number
+			default: 8
+		flip
+
+	state: ->
+		portal = m \.Popover,
 			@attrs.content!
-		m.render portalsEl, @portal
+		m.render portalsEl, portal
+		popper: null
+		portal: portal
+
+	ondefault: ->
+		defaultIsOpen: no
+		placement: \auto
+		offsets: [0 0]
+		padding: 8
+		flips: void
+		allowedFlips: void
+		interactKind: \click
+		targetTag: \div
+		targetAttrs: {}
 
 	ondom: !->
 		@popper = Popper.createPopper @dom, @portal.dom,
@@ -22,17 +48,6 @@ Popover = m.component do
 					options:
 						fallbackPlacements: @attrs.flips
 						allowedAutoPlacements: @attrs.allowedFlips
-
-	ondefault: ->
-		defaultIsOpen: no
-		placement: \auto
-		offsets: [0 0]
-		padding: 8
-		flips: void
-		allowedFlips: void
-		interactKind: \click
-		targetTag: \div
-		targetAttrs: {}
 
 	view: ->
 		m @attrs.targetTag, {

@@ -8,6 +8,9 @@ Icon = m.component do
 		{type, name} = @attrs
 		switch type
 		| \http \https
-			m \img.Icon.Icon-img, src: "#type:#name"
+			m \img.Icon.Icon-img,
+				src: "#type:#name"
+				onload: m.redraw
 		else
-			m \i.Icon, class: "#type fa-#name"
+			m \i.Icon,
+				class: "#type fa-#name"
