@@ -37,55 +37,61 @@ let
 		fetch: (url, dataType = \text) ->
 			(await fetch url)[dataType]!
 
-		menu: (items) ->
+		menu: (items, groupId = \0-) ->
 			items = _.castArray items
 			for item, id in items
-				item.id = id
-				item.color ?= \light
+				item.id = groupId + id + \-
+				item.groupId = groupId
+				item.color ?= \gray
 				if item.submenu
-					item.submenu = m.menu that
+					item.submenu = m.menu that, item.id
 			items
 
 		component: (opts) ->
-			opts.hooks ?= {}
 			->
 				old = null
-				scope =
+				comp = {
+					options: {}
+					...opts
 					attrs: {}
 					children: []
-					dom: null
-				scope <<<< that if opts.methods
-				comp =
+					__oninit: opts.oninit or ->
+					__oncreate: opts.oncreate or ->
+					__onbeforeupdate: opts.onbeforeupdate or ->
+					__onupdate: opts.onupdate or ->
 					oninit: !->
 						m.onvnode @, it
-						scope <<<< that! if opts.state
-						opts.hooks.init?call scope
+						@__oninit!
 						old :=
-							attrs: {...scope.attrs}
-							children: [...scope.children]
+							attrs: {...@attrs}
+							children: [...@children]
+						@__onbeforeupdate old
 					oncreate: !->
-						scope.dom = it.dom
-						opts.hooks.create?call scope
+						@{dom} = it
+						@__oncreate!
+						@__onupdate old
 					onbeforeupdate: ->
 						m.onvnode @, it
-						opts.hooks.onbeforeupdate?call scope, old
+						@__onbeforeupdate old
 					onupdate: !->
-						scope.dom = it.dom
-						opts.hooks.onupdate?call scope, old
+						@{dom} = it
+						@__onupdate old
 						old :=
-							attrs: {...scope.attrs}
-							children: [...scope.children]
-				m.bind scope
+							attrs: {...@attrs}
+							children: [...@children]
+				}
+				m.bind comp
 				comp
 
 		onvnode: (inst, v) !->
 			{model} = inst.options
-			if isUncontrolModel = model and model of inst.attrs
+			if isModelOfAttr = model and model of inst.attrs
 				modelVal = inst.attrs[model]
 			inst.attrs = v.attrs or {}
 			inst.children = v.children or []
-			if attrs = inst.ondefault? v
+			if attrs = inst.ondefault?!
 				for k, val of attrs
-					v.attrs[k] ?= val
-			if isUncontrolModel
+					unless k is model and k of inst.attrs
+						inst.attrs[k] ?= val
+			if isModelOfAttr
 				inst.attrs[model] = modelVal

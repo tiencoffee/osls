@@ -1,10 +1,12 @@
 App = m.component do
 	oninit: (v) !->
-		@colors = <[black white dark gray light blue green yellow red]>
+		@colors = <[gray blue green yellow red]>
 		@val = "Meme"
 		@val2 = "C:/programs/paint.exe"
 		@isShow = yes
-		@popperPlacement = \auto
+		@isOpenPopover = no
+		@placementPopover = \auto
+		@usePortalPopover = yes
 		@list = m.menu [
 			* text: "Chọn"
 				color: \blue
@@ -64,38 +66,73 @@ App = m.component do
 				m Button,
 					color: color
 					color
+			@colors.map (color) ~>
+				m Button,
+					minimal: yes
+					color: color
+					color
+			m Button,
+				color: \blue
+				icon: \star
+				"Dấu trang"
+			m Button,
+				color: \green
+				icon: \key
+			m Button,
+				icon: \key
 			m TextInput,
+				rightElement:
+					m Button,
+						minimal: yes
+						color: \blue
+						icon: \atom
+						"Nguyên tử"
+			m PasswordInput,
+				icon: \key
 				defaultValue: "\#h"
-				oninput: (@val) !~>
+				oninput: !~>
+					@val = it.target.value
 			m TextInput,
 				value: @val2
-				oninput: (@val2) !~>
+				oninput: !~>
+					@val2 = it.target.value
 			m \p @val
 			m \p @val2
 			m \p """Chúng ta vẫn biết rằng, làm việc với một đoạn văn bản dễ đọc và rõ nghĩa dễ gây rối trí và cản trở việc tập trung vào yếu tố trình bày văn bản. Lorem Ipsum có ưu điểm hơn so với đoạn văn bản chỉ gồm nội dung kiểu "Nội dung, nội dung, nội dung" là nó khiến văn bản giống thật hơn, bình thường hơn. Nhiều phần mềm thiết kế giao diện web và dàn trang ngày nay đã sử dụng Lorem Ipsum làm đoạn văn bản giả, và nếu bạn thử tìm các đoạn "Lorem ipsum" trên mạng thì sẽ khám phá ra nhiều trang web hiện vẫn đang trong quá trình xây dựng. Có nhiều phiên bản khác nhau đã xuất hiện, đôi khi do vô tình, nhiều khi do cố ý (xen thêm vào những câu hài hước hay thông tục)."""
 			m Button,
 				onclick: !~>
-					@val = ""
-				"Reset val"
-			m Button,
-				onclick: !~>
 					not= @isShow
 				"Toggle isShow: #{@isShow}"
-			# m Menu,
-			# 	list: @list
+			m Menu,
+				list: @list
+			m Button,
+				onclick: !~>
+					@placementPopover = @placementPopover is \auto and \bottom-end or \auto
+				"placementPopover: #{@placementPopover}"
+			m Button,
+				color: @usePortalPopover and \blue or \gray
+				onclick: !~>
+					not= @usePortalPopover
+				"usePortalPopover: #{@usePortalPopover}"
 			m Icon, name: \home
 			m Icon, name: \fad:beer
 			m Icon, name: \https://image.flaticon.com/icons/svg/3352/3352375.svg
+			m Button,
+				onclick: !~>
+					@val = ""
+				"Reset val"
 			m \span \oks
 			m Button,
 				onclick: !~>
-					@popperPlacement = @popperPlacement is \auto and \bottom-end or \auto
-				"popperPlacement: #{@popperPlacement}"
+					not= @isOpenPopover
+				"isOpenPopover: #{@isOpenPopover}"
 			m Popover,
-				placement: @popperPlacement
+				isOpen: @isOpenPopover
+				placement: @placementPopover
+				usePortal: @usePortalPopover
 				content: ~>
 					m \.p-3,
-						m \h3 "Đây là một cái Popover xịn xò!"
+						m \h3 "Đây là một cái Popover xịn xò"
 						m \small.text-gray Date.now!
 						m \br
 						m ButtonGroup,

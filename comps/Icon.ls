@@ -1,16 +1,22 @@
 Icon = m.component do
-	onassign: !->
+	oninit: !->
+		@type = void
+		@name = void
+
+	onbeforeupdate: !->
 		{name} = @attrs
 		name = "fas:#name" unless name.includes \:
-		[, @attrs.type, @attrs.name] = name is /(.+):(.+)/
+		[, @type, @name] = name is /(.+):(.+)/
 
 	view: ->
-		{type, name} = @attrs
-		switch type
-		| \http \https
+		switch @type
+		| \https \http
 			m \img.Icon.Icon-img,
-				src: "#type:#name"
+				class: @attrs.class
+				src: "#{@type}:#{@name}"
 				onload: m.redraw
 		else
 			m \i.Icon,
-				class: "#type fa-#name"
+				class: m.class do
+					"#{@type} fa-#{@name}"
+					@attrs.class

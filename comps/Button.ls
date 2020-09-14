@@ -1,15 +1,25 @@
 Button = m.component do
 	ondefault: ->
-		color: \light
+		color: \gray
 
 	view: ->
 		m \button.Button,
 			class: m.class do
-				"active": @attrs.active
 				"Button-#{@attrs.color}"
+				"Button-minimal": @attrs.minimal
+				"active": @attrs.active
 				@attrs.class
 			onclick: @attrs.onclick
 			onmouseenter: @attrs.onmouseenter
 			onmouseleave: @attrs.onmouseleave
-			m \.Button-text,
-				@children
+			if @attrs.icon
+				m Icon,
+					class: \Button-icon
+					name: @attrs.icon
+			if @children.length
+				m \.Button-text,
+					@children
+			if @attrs.rightIcon
+				m Icon,
+					class: \Button-icon
+					name: @attrs.rightIcon

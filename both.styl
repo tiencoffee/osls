@@ -1,77 +1,31 @@
 $colors = {
-	black: {
-		bg: #000
-		tint: #343434
-		shade: #000
-		color: #fff
-		text: #000
-		muted: #eee
-	}
-	white: {
-		bg: #fff
-		tint: #fff
-		shade: #e8e8e8
-		color: #000
-		text: #000
-		muted: #66757f
-	}
-	dark: {
-		bg: #3c4248
-		tint: #566069
-		shade: #2a2f33
-		color: #fff
-		text: #3c4248
-		muted: #eee
-	}
 	gray: {
-		bg: #6d7c86
-		tint: #a0aeb7
-		shade: #49555d
-		color: #fff
-		text: #6d7c86
-		muted: #eee
-	}
-	light: {
-		bg: #e5e8ea
-		tint: #f3f5f7
-		shade: #c3c7ca
-		color: #000
-		text: #000
-		muted: #66757f
+		button: #e1e8ed #10161a #ced9e0 #10161a #10161a33
+		menu: #10161a #e1e8ed #10161a #ced9e0 #738694
 	}
 	blue: {
-		bg: #1d88f2
-		tint: #88c7ef
-		shade: #0e74b3
-		color: #fff
-		text: #1d88f2
-		muted: #eee
+		button: #137cbd #fff #0e5a8a #137cbd #137cbd33
+		menu: #137cbd #137cbd #fff #0e5a8a #d8e1e8
 	}
 	green: {
-		bg: #17bf63
-		tint: #84ebb3
-		shade: #108645
-		color: #fff
-		text: #17bf63
-		muted: #eee
+		button: #0f9960 #fff #0a6640 #0f9960 #0f996033
+		menu: #0f9960 #0f9960 #fff #0a6640 #d8e1e8
 	}
 	yellow: {
-		bg: #ffad1f
-		tint: #f9d089
-		shade: #c48415
-		color: #fff
-		text: #ffad1f
-		muted: #eee
+		button: #d9822b #fff #a66321 #d9822b #d9822b33
+		menu: #d9822b #d9822b #fff #a66321 #d8e1e8
 	}
 	red: {
-		bg: #f51e39
-		tint: #ff919f
-		shade: #ce031d
-		color: #fff
-		text: #f51e39
-		muted: #eee
+		button: #db3737 #fff #a82a2a #db3737 #db373733
+		menu: #db3737 #db3737 #fff #a82a2a #d8e1e8
 	}
 }
+full =
+	position absolute
+	left 0
+	top 0
+	width 100%
+	height 100%
 text-truncate =
 	overflow hidden
 	text-overflow ellipsis
@@ -86,10 +40,11 @@ text-security()
 
 body
 	margin 0
-	font-family "Roboto",sans-serif
+	font-family "Barlow",sans-serif
 	font-size 15px
 	line-height 1.2
 	word-break break-word
+	color #10161a
 	user-select none
 *, *:before, *:after
 	box-sizing border-box
@@ -99,32 +54,49 @@ a, img
 	user-drag none
 textarea
 	resize vertical
-input[type=password]
-	text-security square
+::selection
+	background #137cbd
+	color #fff
 
 .Popover
 	border-radius 8px
 	background #fff
-	box-shadow 0 0 0 1px inset #ccd6dd
+	box-shadow 0 0 0 1px inset #ced9e0
 .Popover-target
 	display inline-block
 .Button
+	min-width 30px
+	min-height 30px
 	padding 6px
 	border 0
 	border-radius 6px
+	display inline-flex
+	justify-content center
+	align-items center
 	font inherit
 	cursor pointer
 	outline 0
 .Button-text
 	padding 0 6px
+	pointer-events none
+.Button-icon
+	pointer-events none
 for color, c in $colors
 	.Button-{color}
-		background: c.bg
-		color: c.color
-		box-shadow: 0 0 0 1px inset c.shade
+		background: c.button[0]
+		color: c.button[1]
+		box-shadow: 0 0 0 1px inset c.button[2]
 		&:active
 		&.active
-			background: c.shade
+			background: c.button[2]
+		&.Button-minimal
+			background: #0000
+			color: c.button[3]
+			box-shadow none
+			&:hover
+			&.hover
+				background: c.button[4]
+				color: c.text
 .ButtonGroup
 	> .Button
 		border-radius 0
@@ -133,21 +105,41 @@ for color, c in $colors
 		&:last-child
 			border-radius 0 6px 6px 0
 .TextInput
+	position relative
+	min-height 30px
 	border-radius 6px
 	display flex
-	background #e6ecf0
+	align-items center
+	background #fff
+	box-shadow 0 0 0 1px inset #ced9e0
+	&.focus
+		box-shadow 0 0 0 2px #137cbd
+		z-index 1
 .TextInput-input
 	padding 6px 12px
 	border 0
-	border-radius 6px
 	flex-grow 1
 	font inherit
-	background #fff
-	box-shadow 0 0 0 1px inset #ccd6dd
+	background #0000
 	outline 0
-	&:focus
-		box-shadow: 0 0 0 2px $colors.blue.bg
-		z-index 1
+.TextInput-inputWithLeftElement
+	padding-left 0
+.TextInput-inputWithRightElement
+	padding-right 0
+.TextInput-element
+	min-width 30px
+	padding 3px
+	display inline-flex
+	justify-content center
+	align-items center
+	> .Button
+		min-width 24px
+		height 24px
+		min-height 24px
+.PasswordInput
+	text-security square
+.PasswordInput-showPassword
+	text-security none
 .Menu
 	min-width 180px
 	max-width 360px
@@ -155,7 +147,7 @@ for color, c in $colors
 	border-radius 8px
 	display inline-block
 	background #fff
-	box-shadow 0 0 0 1px inset #ccd6dd
+	box-shadow 0 0 0 1px inset #ced9e0
 .Menu-item
 	position relative
 	padding 6px
@@ -165,20 +157,20 @@ for color, c in $colors
 	cursor pointer
 for color, c in $colors
 	.Menu-item-{color}
-		color: c.text
+		color: c.menu[0]
 		&:hover
 		&.hover
-			background: c.bg
-			color: c.color
+			background: c.menu[1]
+			color: c.menu[2]
 			.Menu-itemLabel
-				color: c.muted
+				color: c.menu[4]
 		&.Menu-item-noSubmenu
 			&:active
 			&.active
-				background: c.shade
-				color: c.color
+				background: c.menu[3]
+				color: c.menu[2]
 				.Menu-itemLabel
-					color: c.muted
+					color: c.menu[4]
 			.Menu-itemLabel
 				font-size 13px
 .Menu-itemIcon
@@ -194,7 +186,7 @@ for color, c in $colors
 	margin-left 12px
 	flex-shrink 0
 	text-align right
-	color #66757f
+	color #738694
 	{text-truncate}
 .Menu-submenu
 	position absolute
@@ -202,17 +194,17 @@ for color, c in $colors
 	top -6px
 	min-width 160px
 	z-index 2
+.Icon
+	display inline-flex
+	justify-content center
+	align-items center
+	font-size 106.75%
+	pointer-events none
 .Icon-img
 	width 1em
 	height 1em
 	display inline-block
 	object-fit scale-down
-for color, c in $colors
-	.{color}
-		background-color: c.bg
-		color: c.color
-	.text-{color}
-		color: c.text
 
 .row
 	display flex
@@ -237,11 +229,7 @@ for i in range(1, 12)
 		> .col-{i}
 			grid-column span (i)
 .full
-	position absolute
-	left 0
-	top 0
-	width 100%
-	height 100%
+	{full}
 .wrap
 	flex-wrap wrap
 .nowrap
