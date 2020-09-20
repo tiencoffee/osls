@@ -1,12 +1,39 @@
 PasswordInput = m.component do
-	options:
-		model: \value
-
 	oninit: !->
 		@isShowPassword = no
+		@inputRef = null
 
-	ondefault: ->
-		value: @attrs.defaultValue ? ""
+	oncontextmenu: (event) !->
+		@attrs.oncontextmenu? event
+		ContextMenu.open [
+			* text: @isShowPassword and "Ẩn mật khẩu" or "Hiện mật khẩu"
+				icon: @isShowPassword and \eye-slash or \eye
+				onclick: !~>
+					not= @isShowPassword
+					@inputRef.dom.focus!
+			,,
+			* text: "Hoàn tác"
+				icon: \undo
+				label: \Ctrl+Z
+				onclick: !~>
+					document.execCommand \undo
+			* text: "Làm lại"
+				icon: \redo
+				label: \Ctrl+Y
+				onclick: !~>
+					document.execCommand \redo
+			,,
+			* text: "Xóa"
+				icon: \trash-alt
+				label: \Backspace
+				onclick: !~>
+					document.execCommand \delete
+			,,
+			* text: "Chọn tất cả"
+				label: \Ctrl+A
+				onclick: !~>
+					@inputRef.dom.select!
+		] event
 
 	view: ->
 		m TextInput,
@@ -16,18 +43,15 @@ PasswordInput = m.component do
 				@attrs.class
 			autofocus: @attrs.autofocus
 			icon: @attrs.icon
-			rightIcon: @attrs.rightIcon
+			value: @attrs.value
+			oninput: @attrs.oninput
+			oncopy: (.preventDefault!)
+			oncut: (.preventDefault!)
+			oncontextmenu: @oncontextmenu
+			inputRef: (@inputRef) ~>
 			rightElement:
 				m Button,
 					minimal: yes
 					icon: @isShowPassword and \eye-slash or \eye
 					onclick: !~>
 						not= @isShowPassword
-			value: @attrs.value
-			oninput: !~>
-				@attrs.value = it.target.value
-				@attrs.oninput? it
-			oncopy: !~>
-				it.preventDefault!
-			oncut: !~>
-				it.preventDefault!

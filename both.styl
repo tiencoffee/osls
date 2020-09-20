@@ -1,7 +1,7 @@
 $colors = {
 	gray: {
-		button: #e1e8ed #10161a #ced9e0 #10161a #10161a33
-		menu: #10161a #e1e8ed #10161a #ced9e0 #738694
+		button: #ebf1f5 #182026 #ced9e0 #182026 #10161a33
+		menu: #182026 #ebf1f5 #182026 #ced9e0 #738694
 	}
 	blue: {
 		button: #137cbd #fff #0e5a8a #137cbd #137cbd33
@@ -20,31 +20,42 @@ $colors = {
 		menu: #db3737 #db3737 #fff #a82a2a #d8e1e8
 	}
 }
-full =
+$full =
 	position absolute
 	left 0
 	top 0
 	width 100%
 	height 100%
-text-truncate =
+$text-truncate =
 	overflow hidden
 	text-overflow ellipsis
 	white-space nowrap
 	word-break break-word
-user-drag()
-	-webkit-user-drag arguments
-	user-drag arguments
+$scroll-y =
+	overflow-x hidden
+	overflow-y auto
+$events =
+	pointer-events none
+	> *
+		pointer-events auto
+appearance()
+	-webkit-appearance arguments
+	appearance arguments
 text-security()
 	-webkit-text-security arguments
 	text-security arguments
+user-drag()
+	-webkit-user-drag arguments
+	user-drag arguments
 
 body
 	margin 0
 	font-family "Barlow",sans-serif
 	font-size 15px
 	line-height 1.2
+	color #182026
+	overflow hidden
 	word-break break-word
-	color #10161a
 	user-select none
 *, *:before, *:after
 	box-sizing border-box
@@ -58,16 +69,42 @@ textarea
 	background #137cbd
 	color #fff
 
+html
+body
+#appEl
+#portalsEl
+	{$full}
+#portalsEl
+	position relative
+	{$events}
+.Portal
+	pointer-events none
+	z-index 8
+	> *
+		pointer-events auto
+.Icon
+	display inline-flex
+	justify-content center
+	align-items center
+	font-size 106.75%
+	pointer-events none
+.Icon-img
+	width 1em
+	height 1em
+	display inline-block
+	object-fit scale-down
 .Popover
+	border solid 1px #ced9e0
 	border-radius 8px
 	background #fff
-	box-shadow 0 0 0 1px inset #ced9e0
+	box-shadow 0 1px 3px #8a9ba888
 .Popover-target
+	border-radius 6px
 	display inline-block
 .Button
 	min-width 30px
 	min-height 30px
-	padding 6px
+	padding 5px
 	border 0
 	border-radius 6px
 	display inline-flex
@@ -76,47 +113,51 @@ textarea
 	font inherit
 	cursor pointer
 	outline 0
+.Button-fill
+	width 100%
+for align in left center right
+	.Button-alignText-{align}
+		> .Button-text
+			text-align align
 .Button-text
-	padding 0 6px
+	padding 0 5px
+	flex-grow 1
 	pointer-events none
 .Button-icon
 	pointer-events none
 for color, c in $colors
 	.Button-{color}
+		border: solid 1px c.button[2]
 		background: c.button[0]
 		color: c.button[1]
-		box-shadow: 0 0 0 1px inset c.button[2]
 		&:active
 		&.active
 			background: c.button[2]
 		&.Button-minimal
+			border 0
 			background: #0000
 			color: c.button[3]
-			box-shadow none
 			&:hover
 			&.hover
 				background: c.button[4]
 				color: c.text
-.ButtonGroup
-	> .Button
-		border-radius 0
-		&:first-child
-			border-radius 6px 0 0 6px
-		&:last-child
-			border-radius 0 6px 6px 0
 .TextInput
 	position relative
 	min-height 30px
+	border solid 1px #ced9e0
 	border-radius 6px
 	display flex
+	flex-grow 1
 	align-items center
 	background #fff
-	box-shadow 0 0 0 1px inset #ced9e0
 	&.focus
+		border-color transparent
+		border-radius 6px !important
 		box-shadow 0 0 0 2px #137cbd
 		z-index 1
 .TextInput-input
-	padding 6px 12px
+	min-height 28px
+	padding 5px 10px
 	border 0
 	flex-grow 1
 	font inherit
@@ -127,8 +168,8 @@ for color, c in $colors
 .TextInput-inputWithRightElement
 	padding-right 0
 .TextInput-element
-	min-width 30px
-	padding 3px
+	min-width 28px
+	padding 2px
 	display inline-flex
 	justify-content center
 	align-items center
@@ -140,20 +181,42 @@ for color, c in $colors
 	text-security square
 .PasswordInput-showPassword
 	text-security none
+.NumberInput-input
+	&::-webkit-inner-spin-button
+		appearance none
+.NumberInput-buttons
+	height 30px
+	display flex
+	flex-direction column
+.NumberInput-button
+	min-height 15px
+.NumberInput-button-up
+	border-bottom 0
+	border-radius 0 6px 0 0
+.NumberInput-button-down
+	border-radius 0 0 6px 0
 .Menu
 	min-width 180px
 	max-width 360px
-	padding 6px
+	padding 5px
+	border solid 1px #ced9e0
 	border-radius 8px
 	display inline-block
 	background #fff
-	box-shadow 0 0 0 1px inset #ced9e0
+.Menu-fill
+	max-width unset
+	width 100%
+.Menu-minimal
+	padding 0
+	border 0
 .Menu-item
+	min-height 30px
 	position relative
-	padding 6px
+	padding 5px
 	border-radius 6px
 	display flex
 	align-items center
+.Menu-item-noSubmenu
 	cursor pointer
 for color, c in $colors
 	.Menu-item-{color}
@@ -176,35 +239,66 @@ for color, c in $colors
 .Menu-itemIcon
 	min-width 1em
 	max-width 1em
-	margin-right 12px
+	margin-right 10px
 	display inline-flex
 	align-items center
+	pointer-events none
 .Menu-itemText
 	flex-grow 1
-	{text-truncate}
+	pointer-events none
+	{$text-truncate}
 .Menu-itemLabel
-	margin-left 12px
+	margin-left 10px
 	flex-shrink 0
 	text-align right
 	color #738694
-	{text-truncate}
-.Menu-submenu
-	position absolute
-	left 100%
-	top -6px
-	min-width 160px
-	z-index 2
-.Icon
-	display inline-flex
-	justify-content center
-	align-items center
-	font-size 106.75%
 	pointer-events none
-.Icon-img
-	width 1em
-	height 1em
-	display inline-block
-	object-fit scale-down
+	{$text-truncate}
+.Menu-submenu
+	min-width 160px
+	box-shadow 0 1px 3px #8a9ba888
+	z-index 2
+.Menu-divider
+	margin 5px
+	border-top solid 1px #d8e1e8
+.Select
+	width 100%
+.Select-content
+	width 100%
+	max-height calc(100vh - 50px)
+	overflow auto
+	.Menu
+		border 0
+.ControlGroup
+	display flex
+	> *
+		margin-right -1px
+		border-radius 0
+	> :first-child
+		border-top-left-radius 6px
+		border-bottom-left-radius 6px
+	> :last-child
+		margin-right 0
+		border-top-right-radius 6px
+		border-bottom-right-radius 6px
+	> .Popover-target
+		> *
+			border-radius inherit
+	> .Popover-target
+	> .ControlGroup
+		&:first-child:not(:last-child)
+			> :last-child
+				border-top-right-radius 0
+				border-bottom-right-radius 0
+		&:last-child:not(:first-child)
+			> :first-child
+				border-top-left-radius 0
+				border-bottom-left-radius 0
+		&:not(:first-child):not(:last-child)
+			> *
+				border-radius 0
+.ContextMenu
+	box-shadow 0 1px 3px #8a9ba888
 
 .row
 	display flex
@@ -229,7 +323,7 @@ for i in range(1, 12)
 		> .col-{i}
 			grid-column span (i)
 .full
-	{full}
+	{$full}
 .wrap
 	flex-wrap wrap
 .nowrap
@@ -260,7 +354,7 @@ for dir in row column
 	align-items stretch
 props = {p: padding, m: margin}
 sides = {t: top, r: right, b: bottom, l: left}
-sizes = 48px 24px 12px 6px 2px 0
+sizes = 40px 20px 10px 5px 2px 0
 for p, prop in props
 	for size, i in sizes
 		i = 5 - i
@@ -317,17 +411,23 @@ for align in left center right justify
 .text-nowrap
 	white-space nowrap
 	word-break break-word
+.text-pre
+	white-space pre
+.text-prewrap
+	white-space pre-wrap
+	word-break break-word
 .text-truncate
-	{text-truncate}
+	{$text-truncate}
 .text-select
 	user-select auto
 .text-noselect
 	user-select none
+.text-security
+	text-security square
 .scroll
 	overflow auto
 .scroll-y
-	overflow-x hidden
-	overflow-y auto
+	{$scroll-y}
 .noscroll
 	overflow hidden
 .event
@@ -335,6 +435,4 @@ for align in left center right justify
 .noevent
 	pointer-events none
 .events
-	pointer-events none
-	> *
-		pointer-events auto
+	{$events}

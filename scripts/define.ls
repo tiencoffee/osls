@@ -1,7 +1,7 @@
 let
 	uniqId = 0
 
-	m <<<<
+	m <<<
 		class: (...vals) ->
 			res = []
 			for val in vals
@@ -34,24 +34,19 @@ let
 		uniqId: ->
 			++uniqId
 
+		resultFn: (fn) ->
+			if typeof fn is \function => fn! else fn
+
+		resultObj: (obj, prop) ->
+			if typeof! obj is \Object => obj[prop] else obj
+
 		fetch: (url, dataType = \text) ->
 			(await fetch url)[dataType]!
-
-		menu: (items, groupId = \0-) ->
-			items = _.castArray items
-			for item, id in items
-				item.id = groupId + id + \-
-				item.groupId = groupId
-				item.color ?= \gray
-				if item.submenu
-					item.submenu = m.menu that, item.id
-			items
 
 		component: (opts) ->
 			->
 				old = null
-				comp = {
-					options: {}
+				vnode = {
 					...opts
 					attrs: {}
 					children: []
@@ -80,18 +75,39 @@ let
 							attrs: {...@attrs}
 							children: [...@children]
 				}
-				m.bind comp
-				comp
+				m.bind vnode
+				vnode
 
-		onvnode: (inst, v) !->
-			{model} = inst.options
-			if isModelOfAttr = model and model of inst.attrs
-				modelVal = inst.attrs[model]
-			inst.attrs = v.attrs or {}
-			inst.children = v.children or []
+		static: (comp, opts) !->
+			comp <<< opts
+			m.bind comp
+
+		onvnode: (inst, vnode) !->
+			inst.attrs = vnode.attrs or {}
+			inst.children = vnode.children or []
 			if attrs = inst.ondefault?!
 				for k, val of attrs
-					unless k is model and k of inst.attrs
-						inst.attrs[k] ?= val
-			if isModelOfAttr
-				inst.attrs[model] = modelVal
+					inst.attrs[k] ?= val
+
+		createPopper: (refEl, popperEl, attrs = {}) ->
+			modifiers =
+				* name: \offset
+					options:
+						offset: attrs.offsets ? [0 0]
+				* name: \preventOverflow
+					options:
+						padding: attrs.padding ? 5
+				* name: \flip
+					options:
+						fallbackPlacements: attrs.flips
+						allowedAutoPlacements: attrs.allowedFlips
+			if attrs.sameWidth
+				modifiers.push do
+					name: \sameWidth
+					enabled: yes
+					phase: \main
+					fn: ({state}) !~>
+						state.styles{}popper.width = "#{state.rects.reference.width}px"
+			Popper.createPopper refEl, popperEl,
+				placement: attrs.placement ? \auto
+				modifiers: modifiers
