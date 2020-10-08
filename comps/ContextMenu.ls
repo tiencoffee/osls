@@ -12,6 +12,8 @@ ContextMenu =
 					view: ~>
 						m Menu,
 							class: \ContextMenu
+							tabindex: 0
+							showEmptyIcons: yes
 							items: items
 							onitemclick: (item) !~>
 								unless item.submenu

@@ -1,5 +1,6 @@
 Button = m.component do
 	ondefault: ->
+		active: no
 		alignText: \center
 		color: \gray
 		fill: no
@@ -11,9 +12,11 @@ Button = m.component do
 				"active": @attrs.active
 				"Button-fill": @attrs.fill
 				"Button-minimal": @attrs.minimal
+				"Button-onlyIcon": (@attrs.icon xor @attrs.rightIcon) and not @children.length
 				"Button-#{@attrs.color}"
 				"Button-alignText-#{@attrs.alignText}"
 				@attrs.class
+			style: m.style @attrs.style
 			onclick: @attrs.onclick
 			oncontextmenu: @attrs.oncontextmenu
 			onmousedown: @attrs.onmousedown
@@ -23,6 +26,9 @@ Button = m.component do
 			onmouseleave: @attrs.onmouseleave
 			onmouseover: @attrs.onmouseover
 			onmouseout: @attrs.onmouseout
+			onpointerdown: @attrs.onpointerdown
+			onpointerup: @attrs.onpointerup
+			onpointermove: @attrs.onpointermove
 			if @attrs.icon
 				m Icon,
 					class: \Button-icon

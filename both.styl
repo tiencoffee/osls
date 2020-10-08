@@ -1,24 +1,73 @@
 $colors = {
 	gray: {
-		button: #ebf1f5 #182026 #ced9e0 #182026 #10161a33
-		menu: #182026 #ebf1f5 #182026 #ced9e0 #738694
+		button: {
+			bg: #ebf1f5
+			text: #182026
+			border: #ced9e0
+			textMinimal: #182026
+			bgMinimal: #dbe1e5
+		}
+		menu: {
+			hover: #dbe1e5
+			hoverLabel: #738694
+		}
 	}
 	blue: {
-		button: #137cbd #fff #0e5a8a #137cbd #137cbd33
-		menu: #137cbd #137cbd #fff #0e5a8a #d8e1e8
+		button: {
+			bg: #007ef6
+			text: #fff
+			border: #0064c3
+			textMinimal: #007ef6
+			bgMinimal: #bce5fd
+		}
+		menu: {
+			hover: #007ef6
+			hoverLabel: #d8e1e8
+		}
 	}
 	green: {
-		button: #0f9960 #fff #0a6640 #0f9960 #0f996033
-		menu: #0f9960 #0f9960 #fff #0a6640 #d8e1e8
+		button: {
+			bg: #4fbb30
+			text: #fff
+			border: #4c9533
+			textMinimal: #4fbb30
+			bgMinimal: #bff8b9
+		}
+		menu: {
+			hover: #4fbb30
+			hoverLabel: #d8e1e8
+		}
 	}
 	yellow: {
-		button: #d9822b #fff #a66321 #d9822b #d9822b33
-		menu: #d9822b #d9822b #fff #a66321 #d8e1e8
+		button: {
+			bg: #fb8300
+			text: #fff
+			border: #c86800
+			textMinimal: #fb8300
+			bgMinimal: #fee6c0
+		}
+		menu: {
+			hover: #fb8300
+			hoverLabel: #d8e1e8
+		}
 	}
 	red: {
-		button: #db3737 #fff #a82a2a #db3737 #db373733
-		menu: #db3737 #db3737 #fff #a82a2a #d8e1e8
+		button: {
+			bg: #f93941
+			text: #fff
+			border: #d71821
+			textMinimal: #f93941
+			bgMinimal: #fec7c9
+		}
+		menu: {
+			hover: #f93941
+			hoverLabel: #d8e1e8
+		}
 	}
+}
+$fonts = {
+	sans: unquote('"Barlow",sans-serif')
+	mono: unquote('"Envy Code R",monospace')
 }
 $full =
 	position absolute
@@ -38,6 +87,12 @@ $events =
 	pointer-events none
 	> *
 		pointer-events auto
+$border =
+	border: solid 1px darken($colors.gray.button.bg,20)
+	border-top-color: darken($colors.gray.button.bg,10)
+	border-bottom-color: darken($colors.gray.button.bg,30)
+$shadow =
+	box-shadow 0 1px 3px #8a9ba888
 appearance()
 	-webkit-appearance arguments
 	appearance arguments
@@ -48,14 +103,20 @@ user-drag()
 	-webkit-user-drag arguments
 	user-drag arguments
 
+@import "//fonts.googleapis.com/css?family=Barlow:500,700"
+@font-face
+	font-family "Envy Code R"
+	src url("//cdn.jsdelivr.net/gh/tiencoffee/fonts/EnvyCodeR.ttf")
+
 body
 	margin 0
-	font-family "Barlow",sans-serif
+	font-family: $fonts.sans
 	font-size 15px
 	line-height 1.2
-	color #182026
 	overflow hidden
 	word-break break-word
+	color #182026
+	tab-size 2
 	user-select none
 *, *:before, *:after
 	box-sizing border-box
@@ -65,8 +126,36 @@ a, img
 	user-drag none
 textarea
 	resize vertical
+b, i, u, s, strong, em, del, strike,
+a, samp, var, tt, small, big,
+span, abbr, acronym, cite, dfn, q, sub, sup, bdo
+output, time
+	vertical-align baseline
+p, pre
+h1, h2, h3, h4, h5, h6
+	margin-top 0
+	margin-bottom 8px
+pre
+	font-family: $fonts.mono
+	white-space pre-wrap
+for size, i in 32px 24px 19px 15px 13px 9px
+	h{i + 1}
+		font-size size
+kbd
+	padding 2px 8px
+	border-radius 6px
+	font-family: $fonts.mono
+	font-size 13px
+	background #ebf1f5
+	{$border}
+code
+	padding 0 4px
+	border-radius 6px
+	font-family: $fonts.mono
+	background #f5498b33
+	color #f5498b
 ::selection
-	background #137cbd
+	background #007ef6
 	color #fff
 
 html
@@ -94,25 +183,26 @@ body
 	display inline-block
 	object-fit scale-down
 .Popover
-	border solid 1px #ced9e0
+	border: solid 1px #a7c1d3
 	border-radius 8px
 	background #fff
-	box-shadow 0 1px 3px #8a9ba888
+	{$shadow}
 .Popover-target
 	border-radius 6px
 	display inline-block
 .Button
-	min-width 30px
-	min-height 30px
-	padding 5px
+	height 28px
+	padding 0 4px
 	border 0
 	border-radius 6px
 	display inline-flex
 	justify-content center
 	align-items center
 	font inherit
-	cursor pointer
+	z-index 0
 	outline 0
+.Button-onlyIcon
+	width 28px
 .Button-fill
 	width 100%
 for align in left center right
@@ -120,126 +210,236 @@ for align in left center right
 		> .Button-text
 			text-align align
 .Button-text
-	padding 0 5px
+	padding 0 4px
 	flex-grow 1
 	pointer-events none
 .Button-icon
 	pointer-events none
 for color, c in $colors
 	.Button-{color}
-		border: solid 1px c.button[2]
-		background: c.button[0]
-		color: c.button[1]
+		border: solid 1px darken(c.button.bg,20)
+		border-top-color: darken(c.button.bg,10)
+		border-bottom-color: darken(c.button.bg,30)
+		background: linear-gradient(lighten(c.button.bg,10),darken(c.button.bg,10))
+		color: c.button.text
+		&:hover
+		&.hover
+			background: linear-gradient(c.button.bg,darken(c.button.bg,15))
 		&:active
 		&.active
-			background: c.button[2]
+			background: darken(c.button.bg,20)
 		&.Button-minimal
 			border 0
-			background: #0000
-			color: c.button[3]
+			background transparent
+			color: c.button.textMinimal
 			&:hover
 			&.hover
-				background: c.button[4]
-				color: c.text
+				background: c.button.bgMinimal
+				color: c.button.textMinimal !important
+			&:active
+			&.active
+				background: darken(c.button.bgMinimal,10)
+				color: c.button.textMinimal !important
+.Button-gray
+	z-index unset
 .TextInput
 	position relative
-	min-height 30px
-	border solid 1px #ced9e0
+	height 28px
 	border-radius 6px
-	display flex
+	display inline-flex
 	flex-grow 1
 	align-items center
 	background #fff
+	{$border}
 	&.focus
 		border-color transparent
-		border-radius 6px !important
-		box-shadow 0 0 0 2px #137cbd
+		border-radius 6px
+		box-shadow 0 0 0 2px #007ef6
 		z-index 1
 .TextInput-input
-	min-height 28px
-	padding 5px 10px
+	width 0
+	height 28px
+	padding 0 8px
 	border 0
 	flex-grow 1
 	font inherit
-	background #0000
+	background transparent
 	outline 0
-.TextInput-inputWithLeftElement
-	padding-left 0
-.TextInput-inputWithRightElement
-	padding-right 0
+.TextInput-hasLeftElement
+	> .TextInput-input
+		padding-left 0
+.TextInput-hasRightElement
+	> .TextInput-input
+		padding-right 0
 .TextInput-element
 	min-width 28px
-	padding 2px
+	padding 0 2px
 	display inline-flex
 	justify-content center
 	align-items center
 	> .Button
-		min-width 24px
-		height 24px
-		min-height 24px
+		height 22px
 .PasswordInput
-	text-security square
+	> .TextInput-input
+		text-security square
 .PasswordInput-showPassword
-	text-security none
-.NumberInput-input
-	&::-webkit-inner-spin-button
-		appearance none
+	> .TextInput-input
+		text-security none
+.NumberInput
+	.TextInput-input
+		&::-webkit-inner-spin-button
+			appearance none
 .NumberInput-buttons
-	height 30px
+	height 28px
 	display flex
 	flex-direction column
+	background: linear-gradient(lighten(#ebf1f5,10),darken(#ebf1f5,10))
 .NumberInput-button
-	min-height 15px
+	height 14px
+	background transparent
 .NumberInput-button-up
 	border-bottom 0
 	border-radius 0 6px 0 0
 .NumberInput-button-down
 	border-radius 0 0 6px 0
+.Checkbox
+.Radio
+	height 28px
+	display inline-flex
+	align-items center
+.Checkbox-input
+.Radio-input
+	width 20px
+	height 20px
+.Checkbox-input
+	> .Button-icon
+		transform scale(.8)
+.Radio-input
+	border-radius 50%
+	> .Button-icon
+		transform scale(.5)
+.Checkbox-label
+.Radio-label
+	margin-left 4px
+.Slider
+	height 28px
+	padding 0 10px
+	display inline-block
+.Slider-body
+	position relative
+	width 100%
+	height 100%
+	display inline-flex
+	align-items center
+.Slider-track
+	width 100%
+	height 8px
+	border-radius 6px
+	background #ced9e0
+.Slider-labels
+	position absolute
+	width 100%
+	display flex
+	align-items center
+	font-size 13px
+	white-space nowrap
+	transform translateY(12px)
+.Slider-label
+	position absolute
+	transform translateX(-50%)
+.Slider-thumb
+	position absolute
+	width 20px
+	height 20px
+	border-radius 50%
+	transform translateX(-50%)
+.Slider-tooltip
+	padding 2px 4px
+	border-radius 6px
+	font-size 13px
+	background #202b33cc
+	color #fff
+.Table
+	border-collapse collapse
+	td
+		padding 4px 8px
+.Table-hasHeader
+	tr:first-child
+		text-align left
+		th
+			position sticky
+			top 0
+			padding 4px 8px
+			border-bottom solid 2px #ced9e0
+			background #fff
+			box-shadow 0 1px #ced9e0
+.Table-content
+	border-radius 6px
+	display inline-block
+	overflow auto
+.Table-bordered
+	td, th
+		border-right solid 1px #ced9e0
+		&:last-child
+			border-right 0
+	tr
+		border-bottom solid 1px #ced9e0
+		&:last-child
+			border-bottom 0
+.Table-striped
+	tr
+		&:nth-child(even)
+			background #ebf1f5
+.Table-interactive
+	&.Table-hasHeader tr:not(:first-child)
+	&:not(.Table-hasHeader) tr
+		&:hover
+			background #dbe1e5
+		&:active
+			background darken(#dbe1e5,10)
 .Menu
-	min-width 180px
 	max-width 360px
-	padding 5px
+	padding 4px 0
 	border solid 1px #ced9e0
 	border-radius 8px
 	display inline-block
 	background #fff
+	outline 0
 .Menu-fill
-	max-width unset
 	width 100%
+	max-width unset
 .Menu-minimal
 	padding 0
 	border 0
 .Menu-item
-	min-height 30px
 	position relative
-	padding 5px
-	border-radius 6px
+	height 28px
+	padding 0 8px
 	display flex
 	align-items center
-.Menu-item-noSubmenu
-	cursor pointer
+	outline 0
 for color, c in $colors
 	.Menu-item-{color}
-		color: c.menu[0]
+		color: c.button.textMinimal
 		&:hover
 		&.hover
-			background: c.menu[1]
-			color: c.menu[2]
-			.Menu-itemLabel
-				color: c.menu[4]
+			background: c.menu.hover
+			color: c.button.text
+			> .Menu-itemLabel
+				color: c.menu.hoverLabel
 		&.Menu-item-noSubmenu
 			&:active
 			&.active
-				background: c.menu[3]
-				color: c.menu[2]
-				.Menu-itemLabel
-					color: c.menu[4]
-			.Menu-itemLabel
+				background: darken(c.button.bg,20)
+				color: c.button.text
+				> .Menu-itemLabel
+					color: c.menu.hoverLabel
+			> .Menu-itemLabel
 				font-size 13px
 .Menu-itemIcon
 	min-width 1em
 	max-width 1em
-	margin-right 10px
+	margin-right 8px
 	display inline-flex
 	align-items center
 	pointer-events none
@@ -248,29 +448,27 @@ for color, c in $colors
 	pointer-events none
 	{$text-truncate}
 .Menu-itemLabel
-	margin-left 10px
+	margin-left 8px
 	flex-shrink 0
 	text-align right
 	color #738694
 	pointer-events none
 	{$text-truncate}
 .Menu-submenu
-	min-width 160px
-	box-shadow 0 1px 3px #8a9ba888
 	z-index 2
+	{$shadow}
 .Menu-divider
-	margin 5px
-	border-top solid 1px #d8e1e8
+	margin 4px 0
+	border-top solid 1px #ced9e0
 .Select
-	width 100%
+	> .Button-text
+		{$text-truncate}
 .Select-content
-	width 100%
-	max-height calc(100vh - 50px)
 	overflow auto
 	.Menu
 		border 0
 .ControlGroup
-	display flex
+	display inline-flex
 	> *
 		margin-right -1px
 		border-radius 0
@@ -297,8 +495,37 @@ for color, c in $colors
 		&:not(:first-child):not(:last-child)
 			> *
 				border-radius 0
+.Calendar
+	border solid 1px #ced9e0
+	border-radius 6px
+	display inline-block
+.Calendar-caption
+	padding 4px 4px 0
+.Calendar-weekdays
+	padding 4px
+	border-bottom solid 1px #ced9e0
+	display flex
+	text-align center
+.Calendar-weekday
+	flex-grow 1
+.Calendar-dates
+	padding 4px
+	display grid
+	grid-template-columns repeat(7,1fr)
+	text-align center
+.Calendar-date
+	> .Button-text
+		display flex
+		flex-direction column
+		align-items center
+.Calendar-outdate
+	color #ced9e0 !important
+.Calendar-lunarDate
+	font-size 9px
 .ContextMenu
-	box-shadow 0 1px 3px #8a9ba888
+	{$shadow}
+	&, .Menu-submenu
+		border-color #a7c1d3
 
 .row
 	display flex
@@ -354,7 +581,7 @@ for dir in row column
 	align-items stretch
 props = {p: padding, m: margin}
 sides = {t: top, r: right, b: bottom, l: left}
-sizes = 40px 20px 10px 5px 2px 0
+sizes = 32px 16px 8px 4px 2px 0
 for p, prop in props
 	for size, i in sizes
 		i = 5 - i
@@ -436,3 +663,7 @@ for align in left center right justify
 	pointer-events none
 .events
 	{$events}
+.border
+	{$border}
+.shadow
+	{$shadow}

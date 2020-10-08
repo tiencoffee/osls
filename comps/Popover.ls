@@ -3,6 +3,7 @@ Popover = m.component do
 		@popper = null
 		@portalEl = null
 		@portalsEl = null
+		@attrs.popoverRef? @
 
 	ondefault: ->
 		isOpen: void
@@ -14,13 +15,20 @@ Popover = m.component do
 		flips: void
 		allowedFlips: void
 		sameWidth: no
-		targetTag: \div
-		targetAttrs: {}
 
 	close: !->
-		if @attrs.isOpen
+		if @popper
 			@attrs.onchange? no
+			@attrs.onclose?!
+			@removePortal!
 			m.redraw!
+
+	removePortal: !->
+		if @popper
+			@popper.destroy!
+			@popper = null
+			m.mount @portalEl, null
+			@portalEl.remove!
 
 	onupdate: (old) !->
 		@portalsEl = @attrs.usePortal and portalsEl or @dom
@@ -31,32 +39,37 @@ Popover = m.component do
 				@portalsEl.appendChild @portalEl
 				popover =
 					view: ~>
-						m \.Popover,
-							@attrs.contentAttrs
-							@attrs.content @
+						m \.Popover {
+							class: m.class @attrs.popoverClass
+							style: m.style @attrs.popoverStyle
+							...@attrs.popoverAttrs
+						} @attrs.content @
 				m.mount @portalEl, popover
-				@popper = m.createPopper @dom, @portalEl, @attrs
+				@popper = m.createPopper @dom, @portalEl, @attrs, yes
+				@popper.forceUpdate!
+				@attrs.onopen? @
 			unless @attrs.placement is old.attrs.placement
 				@popper?setOptions placement: @attrs.placement
 			unless @attrs.usePortal is old.attrs.usePortal
 				@portalsEl.appendChild @portalEl
-			@popper.forceUpdate!
+				@popper.forceUpdate!
 		else
 			if @popper
-				@popper.destroy!
-				@popper = null
-				m.mount @portalEl, null
-				@portalEl.remove!
+				@removePortal!
+
+	onbeforeremove: !->
+		@attrs.popoverRef? null
+		@close!
 
 	view: ->
-		m @attrs.targetTag, {
-			...@attrs.targetAttrs
+		m \div,
 			class: m.class do
 				\Popover-target
-				@attrs.targetAttrs.class
-			onclick: !~>
-				@attrs.targetAttrs.onclick? it
-				unless @attrs.isOpen and @portalEl.contains it.target
-					@attrs.onchange? not @attrs.isOpen
-		},
+				@attrs.class
+			style: @attrs.style
+			onclick: (event) !~>
+				unless @attrs.isOpen and @portalEl.contains event.target
+					isOpen = not @attrs.isOpen
+					@attrs.onchange? isOpen
+					@attrs.onclose?! unless isOpen
 			@children

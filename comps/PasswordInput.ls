@@ -10,7 +10,6 @@ PasswordInput = m.component do
 				icon: @isShowPassword and \eye-slash or \eye
 				onclick: !~>
 					not= @isShowPassword
-					@inputRef.dom.focus!
 			,,
 			* text: "Hoàn tác"
 				icon: \undo
@@ -22,12 +21,6 @@ PasswordInput = m.component do
 				label: \Ctrl+Y
 				onclick: !~>
 					document.execCommand \redo
-			,,
-			* text: "Xóa"
-				icon: \trash-alt
-				label: \Backspace
-				onclick: !~>
-					document.execCommand \delete
 			,,
 			* text: "Chọn tất cả"
 				label: \Ctrl+A
@@ -44,11 +37,12 @@ PasswordInput = m.component do
 			autofocus: @attrs.autofocus
 			icon: @attrs.icon
 			value: @attrs.value
-			oninput: @attrs.oninput
+			inputRef: (@inputRef) !~>
+			onchange: (val, event) !~>
+				@attrs.onchange val, event
 			oncopy: (.preventDefault!)
 			oncut: (.preventDefault!)
 			oncontextmenu: @oncontextmenu
-			inputRef: (@inputRef) ~>
 			rightElement:
 				m Button,
 					minimal: yes

@@ -1,113 +1,178 @@
-let
-	uniqId = 0
+m <<<
+	uniqIdVal: 0
+	requiredPkgs: []
+	cssUnitless:
+		animationIterationCount: yes
+		borderImageOutset: yes
+		borderImageSlice: yes
+		borderImageWidth: yes
+		boxFlex: yes
+		boxFlexGroup: yes
+		boxOrdinalGroup: yes
+		columnCount: yes
+		columns: yes
+		flex: yes
+		flexGrow: yes
+		flexPositive: yes
+		flexShrink: yes
+		flexNegative: yes
+		flexOrder: yes
+		gridArea: yes
+		gridRow: yes
+		gridRowEnd: yes
+		gridRowSpan: yes
+		gridRowStart: yes
+		gridColumn: yes
+		gridColumnEnd: yes
+		gridColumnSpan: yes
+		gridColumnStart: yes
+		fontWeight: yes
+		lineClamp: yes
+		lineHeight: yes
+		opacity: yes
+		order: yes
+		orphans: yes
+		tabSize: yes
+		widows: yes
+		zIndex: yes
+		zoom: yes
+		fillOpacity: yes
+		floodOpacity: yes
+		stopOpacity: yes
+		strokeDasharray: yes
+		strokeDashoffset: yes
+		strokeMiterlimit: yes
+		strokeOpacity: yes
+		strokeWidth: yes
 
-	m <<<
-		class: (...vals) ->
-			res = []
-			for val in vals
-				if Array.isArray val
-					res.push m.class ...val
-				else if val instanceof Object
-					for k, v of val
-						res.push k if v
-				else res.push val
-			res * " "
+	class: (...vals) ->
+		res = []
+		for val in vals
+			if Array.isArray val
+				res.push m.class ...val
+			else if val instanceof Object
+				for k, v of val
+					res.push k if v
+			else if val?
+				res.push val
+		res * " "
 
-		bind: (comp) !->
-			for k, val of comp
-				if typeof val is \function and val.name isnt /(bound|class) /
-					comp[k] = val.bind comp
+	style: (props) ->
+		if props
+			for k, val of props
+				if not m.cssUnitless[k] and +val
+					props[k] += \px
+		props
 
-		rand: (min, max) ->
-			switch &length
-			| 0 =>
-				max = 1
-				min = 0
-			| 1 =>
-				max = min
-				min = 0
-			Math.floor min + Math.random! * (1 + Math.abs max - min)
+	bind: (comp) !->
+		for k, val of comp
+			if typeof val is \function and val.name isnt /(bound|class) /
+				comp[k] = val.bind comp
 
-		uuid: ->
-			"$#{m.rand 9e9}#{m.uniqId!}#{Date.now!}"
+	rand: (min, max) ->
+		switch &length
+		| 0 =>
+			max = 1
+			min = 0
+		| 1 =>
+			max = min
+			min = 0
+		Math.floor min + Math.random! * (1 + Math.abs max - min)
 
-		uniqId: ->
-			++uniqId
+	uuid: ->
+		"$#{m.rand 9e9}#{m.uniqId!}#{Date.now!}"
 
-		resultFn: (fn) ->
-			if typeof fn is \function => fn! else fn
+	uniqId: ->
+		++m.uniqIdVal
 
-		resultObj: (obj, prop) ->
-			if typeof! obj is \Object => obj[prop] else obj
+	resultFn: (fn) ->
+		if typeof fn is \function => fn! else fn
 
-		fetch: (url, dataType = \text) ->
-			(await fetch url)[dataType]!
+	resultObj: (obj, prop) ->
+		if typeof! obj is \Object => obj[prop] else obj
 
-		component: (opts) ->
-			->
-				old = null
-				vnode = {
-					...opts
-					attrs: {}
-					children: []
-					__oninit: opts.oninit or ->
-					__oncreate: opts.oncreate or ->
-					__onbeforeupdate: opts.onbeforeupdate or ->
-					__onupdate: opts.onupdate or ->
-					oninit: !->
-						m.onvnode @, it
-						@__oninit!
-						old :=
-							attrs: {...@attrs}
-							children: [...@children]
-						@__onbeforeupdate old
-					oncreate: !->
-						@{dom} = it
-						@__oncreate!
-						@__onupdate old
-					onbeforeupdate: ->
-						m.onvnode @, it
-						@__onbeforeupdate old
-					onupdate: !->
-						@{dom} = it
-						@__onupdate old
-						old :=
-							attrs: {...@attrs}
-							children: [...@children]
-				}
-				m.bind vnode
-				vnode
+	fetch: (url, dataType = \text) ->
+		(await fetch url)[dataType]!
 
-		static: (comp, opts) !->
-			comp <<< opts
-			m.bind comp
+	component: (opts) ->
+		->
+			old = null
+			vnode = {
+				...opts
+				attrs: {}
+				children: []
+				__oninit: opts.oninit or ->
+				__oncreate: opts.oncreate or ->
+				__onbeforeupdate: opts.onbeforeupdate or ->
+				__onupdate: opts.onupdate or ->
+				oninit: !->
+					m.onvnode @, it
+					@__oninit!
+					old :=
+						attrs: {...@attrs}
+						children: [...@children]
+					@__onbeforeupdate old
+				oncreate: !->
+					@{dom} = it
+					@__oncreate!
+					@__onupdate old
+				onbeforeupdate: ->
+					m.onvnode @, it
+					@__onbeforeupdate old
+				onupdate: !->
+					@{dom} = it
+					@__onupdate old
+					old :=
+						attrs: {...@attrs}
+						children: [...@children]
+			}
+			m.bind vnode
+			vnode
 
-		onvnode: (inst, vnode) !->
-			inst.attrs = vnode.attrs or {}
-			inst.children = vnode.children or []
-			if attrs = inst.ondefault?!
-				for k, val of attrs
-					inst.attrs[k] ?= val
+	static: (comp, opts) !->
+		comp <<< opts
+		m.bind comp
 
-		createPopper: (refEl, popperEl, attrs = {}) ->
-			modifiers =
-				* name: \offset
-					options:
-						offset: attrs.offsets ? [0 0]
-				* name: \preventOverflow
-					options:
-						padding: attrs.padding ? 5
-				* name: \flip
-					options:
-						fallbackPlacements: attrs.flips
-						allowedAutoPlacements: attrs.allowedFlips
-			if attrs.sameWidth
-				modifiers.push do
-					name: \sameWidth
-					enabled: yes
-					phase: \main
-					fn: ({state}) !~>
-						state.styles{}popper.width = "#{state.rects.reference.width}px"
-			Popper.createPopper refEl, popperEl,
-				placement: attrs.placement ? \auto
-				modifiers: modifiers
+	onvnode: (inst, vnode) !->
+		inst.attrs = vnode.attrs or {}
+		inst.children = vnode.children or []
+		if attrs = inst.ondefault?!
+			for k, val of attrs
+				inst.attrs[k] ?= val
+
+	require: (...pkgs) !->
+		code = ""
+		for pkg in pkgs
+			unless m.requiredPkgs[pkg]
+				code += await (await fetch "//cdn.jsdelivr.net/npm/#pkg")text!
+				m.requiredPkgs[pkg]
+		window.eval code if code
+
+	createPopper: (refEl, popperEl, attrs = {}, isSelect) ->
+		modifiers =
+			* name: \offset
+				options:
+					offset: attrs.offsets
+			* name: \preventOverflow
+				options:
+					padding: attrs.padding
+			* name: \flip
+				options:
+					fallbackPlacements: attrs.flips
+					allowedAutoPlacements: attrs.allowedFlips
+		if attrs.sameWidth or isSelect
+			modifiers.push do
+				name: \sameWidth
+				enabled: yes
+				phase: \beforeWrite
+				fn: ({state}) !~>
+					state.styles.popper ?= {}
+					widthPx = state.rects.reference.width + \px
+					if attrs.sameWidth
+						state.styles.popper.width = widthPx
+					if isSelect
+						state.styles.popper.minWidth = widthPx
+		Popper.createPopper refEl, popperEl,
+			placement: attrs.placement ? \auto
+			strategy: \fixed
+			modifiers: modifiers

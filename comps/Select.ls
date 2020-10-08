@@ -1,37 +1,76 @@
 Select = m.component do
 	oninit: !->
 		@isOpen = no
+		@popover = null
+		@item = null
 
 	ondefault: ->
+		value: null
 		items: []
-		item: null
+		minimal: no
+		size: 180
+		maxHeight: @getDefaultMaxHeight!
+		sameWidth: no
+
+	getDefaultMaxHeight: ->
+		Math.floor(innerHeight / 2) - 50
+
+	onmousedownWindow: (event) !->
+		unless event.which is 1 and (@dom.contains event.target or @popover.portalEl.contains event.target)
+			@popover.close!
+
+	onresizeWindow: !->
+		m.redraw!
+
+	removeEventWindow: !->
+		removeEventListener \mousedown @onmousedownWindow, yes
+		removeEventListener \resize @onresizeWindow, yes
+
+	onbeforeupdate: !->
+		@item = @attrs.items.find ~>
+			@attrs.value in [it, it?value]
+		@maxHeight = Math.min @attrs.maxHeight, @getDefaultMaxHeight!
+
+	onupdate: (old) !->
+		unless @isOpen is old.isOpen
+			@removeEventWindow!
+			if @isOpen
+				addEventListener \mousedown @onmousedownWindow, yes
+				addEventListener \resize @onresizeWindow, yes
+
+	onbeforeremove: !->
+		@removeEventWindow!
 
 	view: ->
 		m Popover,
 			isOpen: @isOpen
 			portalClass: \Select-portal
-			placement: \bottom-start
-			flips: [\top-start]
-			allowedFlips: [\bottom-start \top-start]
+			popoverClass: \Select-content
+			popoverStyle:
+				maxHeight: @maxHeight
+			placement: \auto
+			allowedFlips: <[bottom top]>
 			offsets: [0 -1]
-			sameWidth: yes
+			sameWidth: @attrs.sameWidth
+			onopen: @onopen
+			popoverRef: (@popover) !~>
 			onchange: (@isOpen) !~>
-			targetTag: Button
-			targetAttrs:
-				class: \Select
-				fill: yes
-				alignText: \left
-				rightIcon: \caret-down
-				onclick: !~>
-					not= @isOpen
-			contentAttrs:
-				class: \Select-content
 			content: (popover) ~>
 				m Menu,
 					fill: yes
-					item: @attrs.item
+					minWidth: 0
+					scrollIntoView: yes
 					items: @attrs.items
-					onitemchange: (item, event) !~>
-						@attrs.onitemchange? item, event
+					activeItem: @item
+					onchange: (item, event) !~>
+						@attrs.onchange? m.resultObj(item, \value), item, event
 					onitemclick: popover.close
-			m.resultObj @attrs.item, \text
+			m Button,
+				class: \Select
+				style: m.style do
+					width: @attrs.size
+				active: @isOpen
+				minimal: @attrs.minimal
+				alignText: \left
+				rightIcon: \sort
+				m.resultObj @item, \text

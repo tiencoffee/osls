@@ -5,6 +5,7 @@ TextInput = m.component do
 
 	ondefault: ->
 		type: \text
+		size: 180
 
 	oncontextmenu: !->
 		ContextMenu.open [
@@ -18,12 +19,6 @@ TextInput = m.component do
 				label: \Ctrl+Y
 				onclick: !~>
 					document.execCommand \redo
-			,,
-			* text: "Xóa"
-				icon: \trash-alt
-				label: \Backspace
-				onclick: !~>
-					document.execCommand \delete
 			,,
 			* text: "Chọn tất cả"
 				label: \Ctrl+A
@@ -44,24 +39,30 @@ TextInput = m.component do
 		m \.TextInput,
 			class: m.class do
 				"focus": @isFocus
+				"TextInput-hasLeftElement": @attrs.element
+				"TextInput-hasRightElement": @attrs.rightElement
+				@attrs.class
+			style: m.style do
+				width: @attrs.size
+			onfocusout: (event) !~>
+				if event.relatedTarget?closest \.ContextMenu
+					event.target.focus!
 			if @attrs.element
 				m \.TextInput-element that
 			@inputRef =
 				m \input.TextInput-input,
-					class: m.class do
-						"TextInput-inputWithLeftElement": @attrs.element
-						"TextInput-inputWithRightElement": @attrs.rightElement
-						@attrs.class
+					class: @attrs.inputClass
 					type: @attrs.type
 					autofocus: @attrs.autofocus
-					minlength: @attrs.min
-					maxlength: @attrs.max
+					minlength: @attrs.minlength
+					maxlength: @attrs.maxlength
 					min: @attrs.min
 					max: @attrs.max
 					step: @attrs.step
 					required: @attrs.required
 					value: @attrs.value
-					oninput: @attrs.oninput
+					oninput: !~>
+						@attrs.onchange? it.target.value, it
 					onfocus: (event) !~>
 						@isFocus = yes
 						@attrs.onfocus? event
