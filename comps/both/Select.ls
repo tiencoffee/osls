@@ -9,11 +9,8 @@ Select = m.component do
 		items: []
 		minimal: no
 		size: 180
-		maxHeight: @getDefaultMaxHeight!
+		maxHeight: innerHeight
 		sameWidth: no
-
-	getDefaultMaxHeight: ->
-		Math.floor(innerHeight / 2) - 50
 
 	onmousedownWindow: (event) !->
 		unless event.which is 1 and (@dom.contains event.target or @popover.portalEl.contains event.target)
@@ -29,7 +26,9 @@ Select = m.component do
 	onbeforeupdate: !->
 		@item = @attrs.items.find ~>
 			@attrs.value in [it, it?value]
-		@maxHeight = Math.min @attrs.maxHeight, @getDefaultMaxHeight!
+		if @isOpen
+			@maxHeight = Math.floor innerHeight / 2 - @dom.offsetHeight
+			@maxHeight <?= @attrs.maxHeight
 
 	onupdate: (old) !->
 		unless @isOpen is old.isOpen

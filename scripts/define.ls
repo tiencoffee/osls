@@ -64,10 +64,10 @@ m <<<
 					props[k] += \px
 		props
 
-	bind: (comp) !->
-		for k, val of comp
+	bind: (obj) !->
+		for k, val of obj
 			if typeof val is \function and val.name isnt /(bound|class) /
-				comp[k] = val.bind comp
+				obj[k] = val.bind obj
 
 	rand: (min, max) ->
 		switch &length

@@ -29,6 +29,7 @@ Popover = m.component do
 			@popper = null
 			m.mount @portalEl, null
 			@portalEl.remove!
+			@portalEl = null
 
 	onupdate: (old) !->
 		@portalsEl = @attrs.usePortal and portalsEl or @dom

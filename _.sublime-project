@@ -5,6 +5,7 @@
 			"index.html"
 		],
 		"folder_exclude_patterns": [
+			".vercel"
 		]
 	}],
 	"settings": {
